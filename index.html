@@ -17,16 +17,57 @@
     function createPlanet(planetData) {
       const planet = new THREE.Object3D();
 
-      const planetMaterial = new THREE.MeshPhongMaterial({ color: planetData.color });
+      const planetMaterial = new THREE.MeshPhongMaterial({
+        color: planetData.color,
+        map: new THREE.TextureLoader().load(planetData.texture),
+      });
+
       const planetMesh = new THREE.Mesh(planetGeometry, planetMaterial);
       planetMesh.scale.set(planetData.size, planetData.size, planetData.size);
       planet.add(planetMesh);
 
-      // Load texture for each planet
-      if (planetData.texture) {
-        const textureLoader = new THREE.TextureLoader();
-        const texture = textureLoader.load(planetData.texture);
-        planetMaterial.map = texture;
+      // Load cloud texture for Earth
+      if (planetData.planet === 'Earth') {
+        const cloudTexture = new THREE.TextureLoader().load(planetData.cloudTexture);
+        const cloudMaterial = new THREE.MeshPhongMaterial({
+          map: cloudTexture,
+          transparent: true,
+          opacity: 0.8,
+          side: THREE.DoubleSide,
+        });
+
+        const cloudGeometry = new THREE.SphereGeometry(planetData.size + 0.05, 32, 32);
+        const cloudMesh = new THREE.Mesh(cloudGeometry, cloudMaterial);
+        planet.add(cloudMesh);
+
+        // Create Moon
+        const moonData = {
+          planet: 'Moon',
+          color: 0xffffff,
+          size: 0.1,
+          speed: 0.02,
+          distance: planetData.size + 0.5,
+          index: planetData.index + 1,
+          texture: './textures/moon.jpg',
+        };
+
+        const moon = createPlanet(moonData);
+        planet.add(moon);
+      }
+
+      // Load atmosphere texture for Venus
+      if (planetData.planet === 'Venus') {
+        const atmosphereTexture = new THREE.TextureLoader().load(planetData.atmosphereTexture);
+        const atmosphereMaterial = new THREE.MeshPhongMaterial({
+          map: atmosphereTexture,
+          transparent: true,
+          opacity: 0.5,
+          side: THREE.DoubleSide,
+        });
+
+        const atmosphereGeometry = new THREE.SphereGeometry(planetData.size + 0.05, 32, 32);
+        const atmosphereMesh = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+        planet.add(atmosphereMesh);
       }
 
       // Add ring only to Saturn
@@ -34,24 +75,43 @@
         const textureLoader = new THREE.TextureLoader();
         const ringTexture = textureLoader.load('./textures/8k_saturn_ring_alpha.png');
         const ringGeometry = new THREE.RingGeometry(planetData.size + 0.1, planetData.size + 0.2, 64);
-        const ringMaterial = new THREE.MeshPhongMaterial({ color: planetData.ringColor, map: ringTexture, side: THREE.DoubleSide, transparent: true });
+        const ringMaterial = new THREE.MeshPhongMaterial({
+          color: planetData.ringColor,
+          map: ringTexture,
+          side: THREE.DoubleSide,
+          transparent: true,
+        });
         const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
         ringMesh.rotation.x = Math.PI / 2;
         planet.add(ringMesh);
       }
 
-      // Create a circular path
-      // const path = new THREE.Path();
-      // path.absarc(0, 0, planetData.distance, 0, Math.PI * 2, false);
-      // const tubeGeometry = new THREE.TubeGeometry(path, 64, 0.01, 32, false);
-      // const tubeMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
-      // const pathMesh = new THREE.Mesh(tubeGeometry, tubeMaterial);
-      // planet.add(pathMesh);
-
-
       planet.position.x = planetData.distance;
       scene.add(planet);
       return planet;
+    }
+
+    function generatePlanet() {
+      const planetData = {
+        planet: 'Mercury',
+        color: 0xffffff,
+        size: 0.2,
+        speed: 0.01,
+        distance: 2,
+        index: planets.length,
+        texture: './textures/mercury.jpg',
+      };
+
+      const planet = createPlanet(planetData);
+      planets.push(planet);
+      planetParams.push(planetData);
+    }
+
+    function destroyPlanet() {
+      if (planets.length === 0) return;
+      const planet = planets.pop();
+      scene.remove(planet);
+      planetParams.pop();
     }
 
     function updatePlanet(planet, planetData) {
@@ -69,7 +129,7 @@
         planet.position.x = planetData.distance * Math.cos(planet.rotation.y);
         planet.position.z = planetData.distance * Math.sin(planet.rotation.y);
       });
-      
+
       sun.rotation.y += 0.0005;
       galaxy.rotation.y += 0.0005;
       controls.update();
@@ -104,8 +164,8 @@
     const planetGeometry = new THREE.SphereGeometry(1, 32, 32);
     const planetParams = [
       { planet: 'Mercury', color: 0xffffff, size: 0.2, speed: 0.01, distance: 2, index: 0, texture: './textures/mercury.jpg' },
-      { planet: 'Venus', color: 0xffffff, size: 0.3, speed: 0.008, distance: 3, index: 1, texture: './textures/venus.jpg' },
-      { planet: 'Earth', color: 0xffffff, size: 0.4, speed: 0.006, distance: 4, index: 2, texture: './textures/earth.jpg' },
+      { planet: 'Venus', color: 0xffffff, size: 0.3, speed: 0.008, distance: 3, index: 1, texture: './textures/venus.jpg', atmosphereTexture: './textures/venus_atmosphere.jpg' },
+      { planet: 'Earth', color: 0xffffff, size: 0.4, speed: 0.006, distance: 4, index: 2, texture: './textures/earth.jpg', cloudTexture: './textures/earth_clouds.jpg' },
       { planet: 'Mars', color: 0xffffff, size: 0.25, speed: 0.005, distance: 5, index: 3, texture: './textures/mars.jpg' },
       { planet: 'Jupiter', color: 0xffffff, size: 0.6, speed: 0.003, distance: 7, index: 4, texture: './textures/jupiter.jpg' },
       { planet: 'Saturn', color: 0xffffff, size: 0.5, speed: 0.002, distance: 9, index: 5, texture: './textures/saturn.jpg' },
@@ -124,9 +184,24 @@
       folder.add(planetData, 'distance', 1, 20).onChange(() => updatePlanetDistance(planetData));
     });
 
+    const generateButton = {
+      generate: function () {
+        generatePlanet();
+      },
+    };
+
+    const destroyButton = {
+      destroy: function () {
+        destroyPlanet();
+      },
+    };
+
+    gui.add(generateButton, 'generate').name('Generate Planet');
+    gui.add(destroyButton, 'destroy').name('Destroy Planet');
+
     function updatePlanet(planet, planetData) {
       const planetMesh = planet.children[0];
-      planetMesh.material.color.setHex(planetData.color);
+      planetMesh.material.color.set(new THREE.Color(planetData.color));
       planetMesh.scale.set(planetData.size, planetData.size, planetData.size);
       planetParams[planetData.index] = planetData;
     }
@@ -137,7 +212,7 @@
       planetParams[planetData.index].distance = planetData.distance;
     }
 
-    const light = new THREE.PointLight(0xffffff, );
+    const light = new THREE.PointLight(0xffffff);
     scene.add(light);
     scene.add(galaxy);
 
@@ -145,7 +220,32 @@
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
 
+    // Add event listener for keydown event
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Function to handle keydown event
+    function handleKeyDown(event) {
+      const keyCode = event.keyCode;
+
+      // Adjust camera position based on arrow key pressed
+      switch (keyCode) {
+        case 37: // Left arrow key
+          camera.position.x -= 0.5;
+          break;
+        case 38: // Up arrow key
+          camera.position.z -= 0.5;
+          break;
+        case 39: // Right arrow key
+          camera.position.x += 0.5;
+          break;
+        case 40: // Down arrow key
+          camera.position.z += 0.5;
+          break;
+      }
+    }
+
     animate();
+
   </script>
 </body>
 </html>
