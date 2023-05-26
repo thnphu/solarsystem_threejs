@@ -103,7 +103,8 @@
         const folder = gui.addFolder(planetData.planet);
         folder.addColor(planetData, 'color').onChange(() => updatePlanet(planets[planetData.index], planetData));
         folder.add(planetData, 'size', 1, 10).onChange(() => updatePlanet(planets[planetData.index], planetData));
-      folder.add(planetData, 'distance', 1, 20).onChange(() => updatePlanetDistance(planetData));
+        
+        folder.add(planetData, 'distance', 1, 20).onChange(() => updatePlanetDistance(planetData));
       });
       function updatePlanetSpeed(planetData) {
         planetParams[planetData.index].speed = planetData.speed;

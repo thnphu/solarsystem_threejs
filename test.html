@@ -22,12 +22,19 @@
       planetMesh.scale.set(planetData.size, planetData.size, planetData.size);
       planet.add(planetMesh);
 
+      // Load texture for each planet
+      if (planetData.texture) {
+        const textureLoader = new THREE.TextureLoader();
+        const texture = textureLoader.load(planetData.texture);
+        planetMaterial.map = texture;
+      }
+
       // Add ring only to Saturn
       if (planetData.planet === 'Saturn') {
         const textureLoader = new THREE.TextureLoader();
-        const texture = textureLoader.load(planetData.texture);
+        const ringTexture = textureLoader.load('./textures/8k_saturn_ring_alpha.png');
         const ringGeometry = new THREE.RingGeometry(planetData.size + 0.1, planetData.size + 0.2, 64);
-        const ringMaterial = new THREE.MeshPhongMaterial({ color: planetData.ringColor, map: texture, side: THREE.DoubleSide, transparent: true });
+        const ringMaterial = new THREE.MeshPhongMaterial({ color: planetData.ringColor, map: ringTexture, side: THREE.DoubleSide, transparent: true });
         const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
         ringMesh.rotation.x = Math.PI / 2;
         planet.add(ringMesh);
@@ -96,14 +103,14 @@
 
     const planetGeometry = new THREE.SphereGeometry(1, 32, 32);
     const planetParams = [
-      { planet: 'Mercury', color: 0x00ff00, size: 0.2, speed: 0.01, distance: 2, index: 0, texture: 'path/to/mercury_texture.jpg' },
-      { planet: 'Venus', color: 0xff0000, size: 0.3, speed: 0.008, distance: 3, index: 1, texture: 'path/to/venus_texture.jpg' },
-      { planet: 'Earth', color: 0x0000ff, size: 0.4, speed: 0.006, distance: 4, index: 2, texture: 'path/to/earth_texture.jpg' },
-      { planet: 'Mars', color: 0xffcc00, size: 0.25, speed: 0.005, distance: 5, index: 3, texture: 'path/to/mars_texture.jpg' },
-      { planet: 'Jupiter', color: 0xff9900, size: 0.6, speed: 0.003, distance: 7, index: 4, texture: 'path/to/jupiter_texture.jpg' },
-      { planet: 'Saturn', color: 0x663300, size: 0.5, speed: 0.002, distance: 9, index: 5, texture: 'path/to/saturn_texture.jpg' },
-      { planet: 'Uranus', color: 0x3399ff, size: 0.35, speed: 0.001, distance: 11, index: 6, texture: 'path/to/uranus_texture.jpg' },
-      { planet: 'Neptune', color: 0x9999ff, size: 0.3, speed: 0.0005, distance: 13, index: 7, texture: 'path/to/neptune_texture.jpg' }
+      { planet: 'Mercury', color: 0xffffff, size: 0.2, speed: 0.01, distance: 2, index: 0, texture: './textures/mercury.jpg' },
+      { planet: 'Venus', color: 0xffffff, size: 0.3, speed: 0.008, distance: 3, index: 1, texture: './textures/venus.jpg' },
+      { planet: 'Earth', color: 0xffffff, size: 0.4, speed: 0.006, distance: 4, index: 2, texture: './textures/earth.jpg' },
+      { planet: 'Mars', color: 0xffffff, size: 0.25, speed: 0.005, distance: 5, index: 3, texture: './textures/mars.jpg' },
+      { planet: 'Jupiter', color: 0xffffff, size: 0.6, speed: 0.003, distance: 7, index: 4, texture: './textures/jupiter.jpg' },
+      { planet: 'Saturn', color: 0xffffff, size: 0.5, speed: 0.002, distance: 9, index: 5, texture: './textures/saturn.jpg' },
+      { planet: 'Uranus', color: 0xffffff, size: 0.35, speed: 0.001, distance: 11, index: 6, texture: './textures/uranus.jpg' },
+      { planet: 'Neptune', color: 0xffffff, size: 0.3, speed: 0.0005, distance: 13, index: 7, texture: './textures/neptune.jpg' }
     ];
 
       const planets = planetParams.map(createPlanet);
@@ -113,6 +120,7 @@
         const folder = gui.addFolder(planetData.planet);
         folder.addColor(planetData, 'color').onChange(() => updatePlanet(planets[planetData.index], planetData));
         folder.add(planetData, 'size', 1, 10).onChange(() => updatePlanet(planets[planetData.index], planetData));
+        folder.add(planetData, 'speed', 0, 10).onChange(() => updatePlanet(planets[planetData.index], planetData));
         folder.add(planetData, 'distance', 1, 20).onChange(() => updatePlanetDistance(planetData));
       });
       function updatePlanetSpeed(planetData) {
