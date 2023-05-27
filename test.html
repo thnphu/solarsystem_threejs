@@ -252,7 +252,8 @@ var onKeyUp = function(event) {
 };
 
 
-var speed = 1.5;
+var speed = 2;
+var speed_arrow = 1.5;
 var clock = new THREE.Clock();
 var angle = 0;
 
@@ -296,26 +297,26 @@ var MyUpdateLoop = function() {
       //Key arrow controls
       if (rotateLeft)
       {
-        angle+=speed*delta;
+        angle+=speed_arrow*delta;
         Dir.x=Math.sin(angle);
         Dir.z=Math.cos(angle);
         Dir.normalize();
       }
       if(rotateRight)
       {
-        angle-=speed*delta;
+        angle-=speed_arrow*delta;
         Dir.x=Math.sin(angle);
         Dir.z=Math.cos(angle);
         Dir.normalize();
       }
       if(rotateUp)
       {
-        Dir.y += speed*delta;
+        Dir.y += speed_arrow*delta;
         Dir.normalize();
       }
       if(rotateDown)
       {
-        Dir.y -=speed*delta;
+        Dir.y -=speed_arrowwdwee*delta;
         Dir.normalize();
       }
 
