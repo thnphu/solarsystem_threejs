@@ -456,7 +456,7 @@ var MyUpdateLoop = function() {
   camera2.lookAt(Pos.x + Dir.x, Pos.y + Dir.y, Pos.z + Dir.z);
   camera2.updateProjectionMatrix();
 
-  renderer.render(scene, camera2);
+  renderer.render(scene, activeCamera);
 
   requestAnimationFrame(MyUpdateLoop);
 };
