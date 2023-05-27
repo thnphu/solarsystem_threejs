@@ -192,6 +192,10 @@ function switchCamera(){
     var rotateRight = false;
     var rotateUp = false;
     var rotateDown = false;
+    var adjust0 = false;
+    var adjust1 = false;
+    var adjust2 = false;
+    var adjust3 = false;
 
 
     var onKeyDown = function(event) {
@@ -214,17 +218,29 @@ function switchCamera(){
     case 17: // Ctrl
       moveDown = true;
       break;
-    case 37: //left arrow
+    case 74: //J
       rotateLeft = true;
       break;
-    case 39: //right arrow
+    case 76: //L
       rotateRight = true;
       break;
-    case 38: //up arrow
+    case 79: //O
       rotateUp = true;
       break;
-    case 40: //down arrow
+    case 75: //K
       rotateDown = true;
+      break;
+    case 37: // Left arrow key
+      adjust0=true;
+      break;
+    case 38: // Up arrow key
+      adjust1=true;
+      break;
+     case 39: // Right arrow key
+     adjust2=true;
+      break;
+     case 40: // Down arrow key
+     adjust3=true;
       break;
   }
 };
@@ -250,17 +266,29 @@ var onKeyUp = function(event) {
     case 17: 
       moveDown = false;
       break;
-    case 37: 
+    case 74: 
       rotateLeft = false;
       break;
-    case 39:
+    case 76:
       rotateRight = false;
       break;
-    case 38: 
+    case 79: 
       rotateUp = false;
       break;
-    case 40:
+    case 75:
       rotateDown = false;
+      break;
+    case 37: // Left arrow key
+      adjust0=false;
+      break;
+    case 38: // Up arrow key
+      adjust1=false;
+      break;
+     case 39: // Right arrow key
+     adjust2=false;
+      break;
+     case 40: // Down arrow key
+     adjust3=false;
       break;
   }
 };
@@ -330,18 +358,36 @@ var MyUpdateLoop = function() {
       }
       if(rotateDown)
       {
-        Dir.y -=speed_arrowwdwee*delta;
+        Dir.y -=speed_arrow*delta;
         Dir.normalize();
+      }
+      if(adjust0)
+      {
+        camera.position.x -= 0.5;
+      }
+      if(adjust1)
+      {
+        camera.position.z -= 0.5;
+      }
+      if(adjust2)
+      {
+        camera.position.x += 0.5;
+      }
+      if(adjust3)
+      {
+        camera.position.z += 0.5;
       }
 
   
   camera2.position.set(Pos.x, Pos.y, Pos.z);
   camera2.lookAt(Pos.x + Dir.x, Pos.y + Dir.y, Pos.z + Dir.z);
   camera2.updateProjectionMatrix();
+
   renderer.render(scene, activeCamera);
 
   requestAnimationFrame(MyUpdateLoop);
 };
+
 
 var onSwitch = function(event){
   if(event.keyCode === 191) // '/' key
@@ -354,6 +400,8 @@ var onSwitch = function(event){
 document.addEventListener('keydown', onKeyDown, false);
 document.addEventListener('keyup', onKeyUp, false);
 document.addEventListener('keydown', onSwitch, false);
+
+requestAnimationFrame(MyUpdateLoop);
 
     
   </script>
