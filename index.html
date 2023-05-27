@@ -175,14 +175,14 @@ function switchCamera(){
 
     const planetGeometry = new THREE.SphereGeometry(1, 32, 32);
     const planetParams = [
-      { planet: 'Mercury', color: 0xffffff, size: 0.2, speed: 0.01, distance: 2, index: 0, texture: './textures/mercury.jpg' },
-      { planet: 'Venus', color: 0xffffff, size: 0.3, speed: 0.008, distance: 3, index: 1, texture: './textures/venus.jpg', atmosphereTexture: './textures/venus_atmosphere.jpg' },
-      { planet: 'Earth', color: 0xffffff, size: 0.4, speed: 0.006, distance: 4, index: 2, texture: './textures/earth.jpg', cloudTexture: './textures/earth_clouds.jpg' },
-      { planet: 'Mars', color: 0xffffff, size: 0.25, speed: 0.005, distance: 5, index: 3, texture: './textures/mars.jpg' },
-      { planet: 'Jupiter', color: 0xffffff, size: 0.6, speed: 0.003, distance: 7, index: 4, texture: './textures/jupiter.jpg' },
-      { planet: 'Saturn', color: 0xffffff, size: 0.5, speed: 0.002, distance: 9, index: 5, texture: './textures/saturn.jpg' },
-      { planet: 'Uranus', color: 0xffffff, size: 0.35, speed: 0.001, distance: 11, index: 6, texture: './textures/uranus.jpg' },
-      { planet: 'Neptune', color: 0xffffff, size: 0.3, speed: 0.0005, distance: 13, index: 7, texture: './textures/neptune.jpg' }
+      { planet: 'Mercury', color: 0xffffff, size: 0.2, speed: 0.005, distance: 2, index: 0, texture: './textures/mercury.jpg' },
+      { planet: 'Venus', color: 0xffffff, size: 0.3, speed: 0.004, distance: 3, index: 1, texture: './textures/venus.jpg', atmosphereTexture: './textures/venus_atmosphere.jpg' },
+      { planet: 'Earth', color: 0xffffff, size: 0.4, speed: 0.003, distance: 4, index: 2, texture: './textures/earth.jpg', cloudTexture: './textures/earth_clouds.jpg' },
+      { planet: 'Mars', color: 0xffffff, size: 0.25, speed: 0.0025, distance: 5, index: 3, texture: './textures/mars.jpg' },
+      { planet: 'Jupiter', color: 0xffffff, size: 0.6, speed: 0.0015, distance: 7, index: 4, texture: './textures/jupiter.jpg' },
+      { planet: 'Saturn', color: 0xffffff, size: 0.5, speed: 0.001, distance: 9, index: 5, texture: './textures/saturn.jpg' },
+      { planet: 'Uranus', color: 0xffffff, size: 0.35, speed: 0.00025, distance: 11, index: 6, texture: './textures/uranus.jpg' },
+      { planet: 'Neptune', color: 0xffffff, size: 0.3, speed: 0.00025, distance: 13, index: 7, texture: './textures/neptune.jpg' }
     ];
 
     const planets = planetParams.map(createPlanet);
