@@ -18,67 +18,54 @@ var activeCamera;
 const audioLoader = new THREE.AudioLoader();
 const listener = new THREE.AudioListener();
 
-const sound = new THREE.Audio(listener);
-const switchCam = new THREE.Audio(listener)
-const speedUp = new THREE.Audio(listener);
-const moveBack = new THREE.Audio(listener);
-const move = new THREE.Audio(listener);
-const angleChange = new THREE.Audio(listener);
+const soundEffects = { 
+  sound: new THREE.Audio(listener),
+  switchCam: new THREE.Audio(listener),
+  speedUp: new THREE.Audio(listener),
+  move: new THREE.Audio(listener),
+  moveBack: new THREE.Audio(listener),
+  angleChange: new THREE.Audio(listener),
+  moveY: new THREE.Audio(listener),
+  clickEffect: new THREE.Audio(listener),
+  createP: new THREE.Audio(listener),
+  destroyP: new THREE.Audio(listener)
+};
 
-document.addEventListener('click',function(){
-audioLoader.load('sounds/bgm-chill.mp3', function(buffer){
-  sound.setBuffer(buffer);
-  sound.setLoop(true);
-  sound.setVolume(0.5);
-  sound.play();
+
+function loadSoundEffect(soundEffect, filePath, loop, volume) {
+  audioLoader.load(filePath, function(buffer) {
+    soundEffect.setBuffer(buffer);
+    soundEffect.setLoop(loop);
+    soundEffect.setVolume(volume);
+  });
+}
+
+loadSoundEffect(soundEffects.sound, 'sounds/bgm-chill.mp3', true, 0.5);
+loadSoundEffect(soundEffects.switchCam, 'sounds/switch-click-and-beep.mp3', false, 0.6);
+loadSoundEffect(soundEffects.speedUp, 'sounds/transition-futuristic.mp3', false, 0.6);
+loadSoundEffect(soundEffects.moveBack, 'sounds/transition-base.mp3', false, 0.6);
+loadSoundEffect(soundEffects.move, 'sounds/new-move.mp3', false, 1);
+loadSoundEffect(soundEffects.moveY, 'sounds/move.mp3', false, 0.3);
+loadSoundEffect(soundEffects.angleChange, 'sounds/change angle.mp3', false, 1);
+loadSoundEffect(soundEffects.clickEffect, 'sounds/rclick.mp3', false, 1);
+loadSoundEffect(soundEffects.createP, 'sounds/create planet.mp3', false, 1);
+loadSoundEffect(soundEffects.destroyP, 'sounds/destroy planet.mp3', false, 1);
+
+
+document.addEventListener('click', function() {
+  if (!soundEffects.sound.isPlaying) {
+    soundEffects.sound.play();
+  }
 });
-});
-
-
-audioLoader.load('sounds/switch-click-and-beep.mp3', function(buffer){
-  switchCam.setBuffer(buffer);
-  switchCam.setLoop(false);
-  switchCam.setVolume(0.6);
-});
-
-audioLoader.load('sounds/transition-futuristic.mp3', function(buffer){
-  speedUp.setBuffer(buffer);
-  speedUp.setLoop(false);
-  speedUp.setVolume(0.6);
-});
-
-
-audioLoader.load('sounds/transition-base.mp3', function(buffer){
-  moveBack.setBuffer(buffer);
-  moveBack.setLoop(false);
-  moveBack.setVolume(0.6);
-});
-
-audioLoader.load('sounds/new-move.mp3', function(buffer){
-  move.setBuffer(buffer);
-  move.setLoop(false);
-  move.setVolume(1);
-});
-
-audioLoader.load('sounds/change angle.mp3', function(buffer){
-  angleChange.setBuffer(buffer);
-  angleChange.setLoop(false);
-  angleChange.setVolume(1);
-});
-
-
-
 
 function switchCamera(){
   if(activeCamera === camera){
     activeCamera = camera2;
-    camera2.add(sound)
   } else {
-    switchCam.play();
+    soundEffects.switchCam.play();
     activeCamera = camera;
-    camera.add(sound);
   }
-}
+};
 
 
     function createPlanet(planetData) {
@@ -246,26 +233,33 @@ function switchCamera(){
     const gui = new dat.GUI();
     planetParams.forEach(planetData => {
       const folder = gui.addFolder(planetData.planet);
-      folder.addColor(planetData, 'color').onChange(() => updatePlanet(planets[planetData.index], planetData));
-      folder.add(planetData, 'size', 0, 10).onChange(() => updatePlanet(planets[planetData.index], planetData));
-      folder.add(planetData, 'speed', 0, 10).onChange(() => updatePlanet(planets[planetData.index], planetData));
-      folder.add(planetData, 'distance', 1, 20).onChange(() => updatePlanetDistance(planetData));
+      folder.addColor(planetData, 'color').onChange(() => {updatePlanet(planets[planetData.index], planetData); playSoundEffect(soundEffects.clickEffect);});
+      folder.add(planetData, 'size', 0, 10).onChange(() => {updatePlanet(planets[planetData.index], planetData); playSoundEffect(soundEffects.clickEffect);});
+      folder.add(planetData, 'speed', 0, 10).onChange(() => {updatePlanet(planets[planetData.index], planetData); playSoundEffect(soundEffects.clickEffect);});
+      folder.add(planetData, 'distance', 1, 20).onChange(() => {updatePlanetDistance(planetData); playSoundEffect(soundEffects.clickEffect);});
     });
 
     const generateButton = {
       generate: function () {
         generatePlanet();
+        playSoundEffect(soundEffects.createP);
       },
     };
 
     const destroyButton = {
       destroy: function () {
         destroyPlanet();
+        playSoundEffect(soundEffects.destroyP);
       },
     };
 
     gui.add(generateButton, 'generate').name('Generate Planet');
     gui.add(destroyButton, 'destroy').name('Destroy Planet');
+
+    function playSoundEffect(soundEffect)
+    {
+      soundEffect.play();
+    }
 
     function updatePlanet(planet, planetData) {
       const planetMesh = planet.children[0];
@@ -311,124 +305,127 @@ function switchCamera(){
     renderer.render(scene,camera2);
     
     window.addEventListener( 'resize', MyResize);
-    var moveForward = false;
-    var moveBackward = false;
-    var moveLeft = false;
-    var moveRight = false;
-    var moveUp = false;
-    var moveDown = false;
-    var rotateLeft = false;
-    var rotateRight = false;
-    var rotateUp = false;
-    var rotateDown = false;
-    var adjust0 = false;
-    var adjust1 = false;
-    var adjust2 = false;
-    var adjust3 = false;
+    var flags = { 
+      moveForward: false,
+      moveBackward: false,
+      moveLeft: false,
+      moveRight: false,
+      moveUp: false,
+      moveDown: false,
+      rotateLeft: false,
+      rotateRight: false,
+      rotateUp: false,
+      rotateDown: false,
+      adjust0: false,
+      adjust1: false,
+      adjust2: false,
+      adjust3: false
+    };
 
-
-    var onKeyDown = function(event) {
-   switch (event.keyCode) {
-    case 87: // W 
-      moveForward = true;
+var onKeyDown = function(event) {
+  switch (event.keyCode) {
+    case 87: // W
+      flags.moveForward = true;
       break;
-    case 83: // S 
-      moveBackward = true;
+    case 83: // S
+      flags.moveBackward = true;
       break;
-    case 65: // A 
-      moveLeft = true;
+    case 65: // A
+      flags.moveLeft = true;
       break;
-    case 68: // D 
-      moveRight = true;
+    case 68: // D
+      flags.moveRight = true;
       break;
     case 32: // Space bar
-      moveUp = true;
+      flags.moveUp = true;
       break;
     case 17: // Ctrl
-      moveDown = true;
+      flags.moveDown = true;
       break;
-    case 74: //J
-      rotateLeft = true;
+    case 74: // J
+      flags.rotateLeft = true;
       break;
-    case 76: //L
-      rotateRight = true;
+    case 76: // L
+      flags.rotateRight = true;
       break;
-    case 79: //O
-      rotateUp = true;
+    case 79: // O
+      flags.rotateUp = true;
       break;
-    case 75: //K
-      rotateDown = true;
+    case 75: // K
+      flags.rotateDown = true;
       break;
     case 37: // Left arrow key
-      adjust0=true;
+      flags.adjust0 = true;
       break;
     case 38: // Up arrow key
-      adjust1=true;
+      flags.adjust1 = true;
       break;
-     case 39: // Right arrow key
-     adjust2=true;
+    case 39: // Right arrow key
+      flags.adjust2 = true;
       break;
-     case 40: // Down arrow key
-     adjust3=true;
+    case 40: // Down arrow key
+      flags.adjust3 = true;
       break;
   }
 };
-
 
 var onKeyUp = function(event) {
   switch (event.keyCode) {
-    case 87: 
-      moveForward = false;
-      move.play();
+    case 87:
+      flags.moveForward = false;
+      soundEffects.move.play();
       break;
-    case 83: 
-      moveBackward = false;
-      move.play();
+    case 83:
+      flags.moveBackward = false;
+      soundEffects.move.play();
       break;
-    case 65: 
-      moveLeft = false;
-      move.play();
+    case 65:
+      flags.moveLeft = false;
+      soundEffects.move.play();
       break;
-    case 68: 
-      moveRight = false;
-      move.play();
+    case 68:
+      flags.moveRight = false;
+      soundEffects.move.play();
       break;
-    case 32: 
-      moveUp = false;
+    case 32:
+      flags.moveUp = false;
+      soundEffects.moveY.play();
       break;
-    case 17: 
-      moveDown = false;
+    case 17:
+      flags.moveDown = false;
+      soundEffects.moveY.play();
       break;
-    case 74: 
-      rotateLeft = false;
-      angleChange.play();
+    case 74:
+      flags.rotateLeft = false;
+      soundEffects.angleChange.play();
       break;
     case 76:
-      rotateRight = false;
-      angleChange.play();
+      flags.rotateRight = false;
+      soundEffects.angleChange.play();
       break;
-    case 79: 
-      rotateUp = false;
-      angleChange.play();
+    case 79:
+      flags.rotateUp = false;
+      soundEffects.angleChange.play();
       break;
     case 75:
-      rotateDown = false;
-      angleChange.play();
+      flags.rotateDown = false;
+      soundEffects.angleChange.play();
       break;
-    case 37: 
-      adjust0=false;
+    case 37:
+      flags.adjust0 = false;
       break;
-    case 38: 
-      adjust1=false;
+    case 38:
+      flags.adjust1 = false;
       break;
-     case 39:
-     adjust2=false;
+    case 39:
+      flags.adjust2 = false;
       break;
-     case 40: 
-     adjust3=false;
+    case 40:
+      flags.adjust3 = false;
       break;
   }
 };
+
 
 
 var speed = 2;
@@ -440,24 +437,24 @@ var MyUpdateLoop = function() {
   var delta = clock.getDelta();
 
   //WASD controls
-  if(moveForward)
+  if(flags.moveForward)
       {
         Pos.x+=Dir.x*speed*delta;
         Pos.z+=Dir.z*speed*delta;
       }
-      if(moveBackward)
+      if(flags.moveBackward)
       {
         Pos.x-=Dir.x*speed*delta;
         Pos.z-=Dir.z*speed*delta;
       }
-      if(moveLeft)
+      if(flags.moveLeft)
       {
         var left = new THREE.Vector3(Dir.z, 0, -Dir.x);
         left.normalize();
         Pos.x += left.x*speed*delta;
         Pos.z += left.z*speed*delta;
       }
-      if(moveRight)
+      if(flags.moveRight)
       {
         var right = new THREE.Vector3(-Dir.z,0,Dir.x);
         right.normalize();
@@ -466,58 +463,58 @@ var MyUpdateLoop = function() {
       }
 
       //Space bar + ctrl
-       if (moveUp) {
+       if (flags.moveUp) {
         Pos.y+=speed*delta;
        }
-       if (moveDown) {
+       if (flags.moveDown) {
         Pos.y-=speed*delta;
       }
 
       //OJKL controls
-      if (rotateLeft)
+      if (flags.rotateLeft)
       {
         angle+=speed_arrow*delta;
         Dir.x=Math.sin(angle);
         Dir.z=Math.cos(angle);
         Dir.normalize();
       }
-      if(rotateRight)
+      if(flags.rotateRight)
       {
         angle-=speed_arrow*delta;
         Dir.x=Math.sin(angle);
         Dir.z=Math.cos(angle);
         Dir.normalize();
       }
-      if(rotateUp)
+      if(flags.rotateUp)
       {
         Dir.y += speed_arrow*delta;
         Dir.normalize();
       }
-      if(rotateDown)
+      if(flags.rotateDown)
       {
         Dir.y -=speed_arrow*delta;
         Dir.normalize();
       }
 
       //Key arrow controls as camera 1
-      if(adjust0)
+      if(flags.adjust0)
       {
-        moveBack.play();
+        soundEffects.moveBack.play();
         camera.position.x -= 0.5;
       }
-      if(adjust1)
+      if(flags.adjust1)
       {
-        speedUp.play();
+        soundEffects.speedUp.play();
         camera.position.z -= 0.5;
       }
-      if(adjust2)
+      if(flags.adjust2)
       {
-        moveBack.play();
+        soundEffects.moveBack.play();
         camera.position.x += 0.5;
       }
-      if(adjust3)
+      if(flags.adjust3)
       {
-        speedUp.play();
+        soundEffects.speedUp.play();
         camera.position.z += 0.5;
       }
 
@@ -535,7 +532,7 @@ var MyUpdateLoop = function() {
 var onSwitch = function(event){
   if(event.keyCode === 50) // '2' for camera 2
   {
-    switchCam.play();
+    soundEffects.switchCam.play();
     switchCamera();
   }
 };
