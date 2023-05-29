@@ -15,15 +15,71 @@
   <script>
 
 var activeCamera;
+const audioLoader = new THREE.AudioLoader();
+const listener = new THREE.AudioListener();
+
+const sound = new THREE.Audio(listener);
+const switchCam = new THREE.Audio(listener)
+const speedUp = new THREE.Audio(listener);
+const moveBack = new THREE.Audio(listener);
+const move = new THREE.Audio(listener);
+const angleChange = new THREE.Audio(listener);
+
+document.addEventListener('click',function(){
+audioLoader.load('sounds/bgm-chill.mp3', function(buffer){
+  sound.setBuffer(buffer);
+  sound.setLoop(true);
+  sound.setVolume(0.5);
+  sound.play();
+});
+});
+
+
+audioLoader.load('sounds/switch-click-and-beep.mp3', function(buffer){
+  switchCam.setBuffer(buffer);
+  switchCam.setLoop(false);
+  switchCam.setVolume(0.6);
+});
+
+audioLoader.load('sounds/transition-futuristic.mp3', function(buffer){
+  speedUp.setBuffer(buffer);
+  speedUp.setLoop(false);
+  speedUp.setVolume(0.6);
+});
+
+
+audioLoader.load('sounds/transition-base.mp3', function(buffer){
+  moveBack.setBuffer(buffer);
+  moveBack.setLoop(false);
+  moveBack.setVolume(0.6);
+});
+
+audioLoader.load('sounds/new-move.mp3', function(buffer){
+  move.setBuffer(buffer);
+  move.setLoop(false);
+  move.setVolume(1);
+});
+
+audioLoader.load('sounds/change angle.mp3', function(buffer){
+  angleChange.setBuffer(buffer);
+  angleChange.setLoop(false);
+  angleChange.setVolume(1);
+});
+
+
 
 
 function switchCamera(){
   if(activeCamera === camera){
     activeCamera = camera2;
+    camera2.add(sound)
   } else {
+    switchCam.play();
     activeCamera = camera;
+    camera.add(sound);
   }
 }
+
 
     function createPlanet(planetData) {
       const planet = new THREE.Object3D();
@@ -323,15 +379,19 @@ var onKeyUp = function(event) {
   switch (event.keyCode) {
     case 87: 
       moveForward = false;
+      move.play();
       break;
     case 83: 
       moveBackward = false;
+      move.play();
       break;
     case 65: 
       moveLeft = false;
+      move.play();
       break;
     case 68: 
       moveRight = false;
+      move.play();
       break;
     case 32: 
       moveUp = false;
@@ -341,15 +401,19 @@ var onKeyUp = function(event) {
       break;
     case 74: 
       rotateLeft = false;
+      angleChange.play();
       break;
     case 76:
       rotateRight = false;
+      angleChange.play();
       break;
     case 79: 
       rotateUp = false;
+      angleChange.play();
       break;
     case 75:
       rotateDown = false;
+      angleChange.play();
       break;
     case 37: 
       adjust0=false;
@@ -438,18 +502,22 @@ var MyUpdateLoop = function() {
       //Key arrow controls as camera 1
       if(adjust0)
       {
+        moveBack.play();
         camera.position.x -= 0.5;
       }
       if(adjust1)
       {
+        speedUp.play();
         camera.position.z -= 0.5;
       }
       if(adjust2)
       {
+        moveBack.play();
         camera.position.x += 0.5;
       }
       if(adjust3)
       {
+        speedUp.play();
         camera.position.z += 0.5;
       }
 
@@ -467,6 +535,7 @@ var MyUpdateLoop = function() {
 var onSwitch = function(event){
   if(event.keyCode === 50) // '2' for camera 2
   {
+    switchCam.play();
     switchCamera();
   }
 };
