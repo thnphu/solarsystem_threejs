@@ -14,51 +14,51 @@
   <script src="./js/GLTFLoader.js"></script>
   <script>
 
-var activeCamera;
-const audioLoader = new THREE.AudioLoader();
-const listener = new THREE.AudioListener();
+    var activeCamera;
+    const audioLoader = new THREE.AudioLoader();
+    const listener = new THREE.AudioListener();
 
-const soundEffects = { 
-  sound: new THREE.Audio(listener),
-  switchCam: new THREE.Audio(listener),
-  speedUp: new THREE.Audio(listener),
-  move: new THREE.Audio(listener),
-  moveBack: new THREE.Audio(listener),
-  angleChange: new THREE.Audio(listener),
-  moveY: new THREE.Audio(listener),
-  clickEffect: new THREE.Audio(listener),
-  createP: new THREE.Audio(listener),
-  destroyP: new THREE.Audio(listener)
-};
-
-
-function loadSoundEffect(soundEffect, filePath, loop, volume) {
-  audioLoader.load(filePath, function(buffer) {
-    soundEffect.setBuffer(buffer);
-    soundEffect.setLoop(loop);
-    soundEffect.setVolume(volume);
-  });
-}
-
-loadSoundEffect(soundEffects.sound, 'sounds/bgm-chill.mp3', true, 0.5);
-loadSoundEffect(soundEffects.switchCam, 'sounds/switch-click-and-beep.mp3', false, 0.6);
-loadSoundEffect(soundEffects.speedUp, 'sounds/transition-futuristic.mp3', false, 0.6);
-loadSoundEffect(soundEffects.moveBack, 'sounds/transition-base.mp3', false, 0.6);
-loadSoundEffect(soundEffects.move, 'sounds/new-move.mp3', false, 1);
-loadSoundEffect(soundEffects.moveY, 'sounds/move.mp3', false, 0.3);
-loadSoundEffect(soundEffects.angleChange, 'sounds/change angle.mp3', false, 1);
-loadSoundEffect(soundEffects.clickEffect, 'sounds/rclick.mp3', false, 1);
-loadSoundEffect(soundEffects.createP, 'sounds/create planet.mp3', false, 1);
-loadSoundEffect(soundEffects.destroyP, 'sounds/destroy planet.mp3', false, 1);
+    const soundEffects = { 
+      sound: new THREE.Audio(listener),
+      switchCam: new THREE.Audio(listener),
+      speedUp: new THREE.Audio(listener),
+      move: new THREE.Audio(listener),
+      moveBack: new THREE.Audio(listener),
+      angleChange: new THREE.Audio(listener),
+      moveY: new THREE.Audio(listener),
+      clickEffect: new THREE.Audio(listener),
+      createP: new THREE.Audio(listener),
+      destroyP: new THREE.Audio(listener)
+    };
 
 
-document.addEventListener('click', function() {
+    function loadSoundEffect(soundEffect, filePath, loop, volume) {
+      audioLoader.load(filePath, function(buffer) {
+        soundEffect.setBuffer(buffer);
+        soundEffect.setLoop(loop);
+        soundEffect.setVolume(volume);
+      });
+    }
+
+    loadSoundEffect(soundEffects.sound, 'sounds/bgm-chill.mp3', true, 0.5);
+    loadSoundEffect(soundEffects.switchCam, 'sounds/switch-click-and-beep.mp3', false, 0.6);
+    loadSoundEffect(soundEffects.speedUp, 'sounds/transition-futuristic.mp3', false, 0.6);
+    loadSoundEffect(soundEffects.moveBack, 'sounds/transition-base.mp3', false, 0.6);
+    loadSoundEffect(soundEffects.move, 'sounds/new-move.mp3', false, 1);
+    loadSoundEffect(soundEffects.moveY, 'sounds/move.mp3', false, 0.3);
+    loadSoundEffect(soundEffects.angleChange, 'sounds/change angle.mp3', false, 1);
+    loadSoundEffect(soundEffects.clickEffect, 'sounds/rclick.mp3', false, 1);
+    loadSoundEffect(soundEffects.createP, 'sounds/create planet.mp3', false, 1);
+    loadSoundEffect(soundEffects.destroyP, 'sounds/destroy planet.mp3', false, 1);
+
+
+    document.addEventListener('click', function() {
   if (!soundEffects.sound.isPlaying) {
     soundEffects.sound.play();
   }
 });
 
-function switchCamera(){
+    function switchCamera(){
   if(activeCamera === camera){
     activeCamera = camera2;
   } else {
@@ -146,20 +146,24 @@ function switchCamera(){
     }
 
     function generatePlanet() {
-      const planetData = {
-        planet: 'Mercury',
-        color: 0xffffff,
-        size: 0.2,
-        speed: 0.01,
-        distance: 2,
-        index: planets.length,
-        texture: './textures/mercury.jpg',
-      };
+      const planetData = [
+        { planet: 'Mercury', color: 0xffffff, size: 0.2, speed: 0.005, distance: 2, index: 0, texture: './textures/mercury.jpg' },
+        { planet: 'Venus', color: 0xffffff, size: 0.3, speed: 0.004, distance: 3, index: 1, texture: './textures/venus.jpg', atmosphereTexture: './textures/venus_atmosphere.jpg' },
+        { planet: 'Earth', color: 0xffffff, size: 0.4, speed: 0.003, distance: 4, index: 2, texture: './textures/earth.jpg', cloudTexture: './textures/earth_clouds.jpg' },
+        { planet: 'Mars', color: 0xffffff, size: 0.25, speed: 0.0025, distance: 5, index: 3, texture: './textures/mars.jpg' },
+        { planet: 'Jupiter', color: 0xffffff, size: 0.6, speed: 0.0015, distance: 7, index: 4, texture: './textures/jupiter.jpg' },
+        { planet: 'Saturn', color: 0xffffff, size: 0.5, speed: 0.001, distance: 9, index: 5, texture: './textures/saturn.jpg' },
+        { planet: 'Uranus', color: 0xffffff, size: 0.35, speed: 0.00025, distance: 11, index: 6, texture: './textures/uranus.jpg' },
+        { planet: 'Neptune', color: 0xffffff, size: 0.3, speed: 0.00025, distance: 13, index: 7, texture: './textures/neptune.jpg' }
+      ];
 
-      const planet = createPlanet(planetData);
-      planets.push(planet);
-      planetParams.push(planetData);
+      for (let i = 0; i < planetData.length; i++) {
+        const planet = createPlanet(planetData[i]);
+        planets.push(planet);
+        planetParams.push(planetData[i]);
+      }
     }
+
 
     function destroyPlanet() {
       if (planets.length === 0) return;
