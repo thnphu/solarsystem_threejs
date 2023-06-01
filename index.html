@@ -192,6 +192,8 @@
         planet.position.z = planetData.distance * Math.sin(planet.rotation.y);
       });
 
+      
+
       sun.rotation.y += 0.0005;
       galaxy.rotation.x += 0.0005;
       galaxy.rotation.y += 0.0005;
@@ -206,6 +208,15 @@
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
+    // Adjust ambient light intensity
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.1); // Increase the intensity value (e.g., 0.5)
+    scene.add(ambientLight);
+
+    // Adjust directional light intensity
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.1); // Increase the intensity value (e.g., 0.5)
+    directionalLight.position.set(0, 1, 0);
+    scene.add(directionalLight);
+
 
     const sunGeometry = new THREE.SphereGeometry(1, 32, 32);
     const sunTexture = new THREE.TextureLoader().load('./textures/8k_sun.jpg');
@@ -246,6 +257,24 @@
       folder.add(planetData, 'size', 0, 10).onChange(() => {updatePlanet(planets[planetData.index], planetData); playSoundEffect(soundEffects.clickEffect);});
       folder.add(planetData, 'speed', 0, 10).onChange(() => {updatePlanet(planets[planetData.index], planetData); playSoundEffect(soundEffects.clickEffect);});
       folder.add(planetData, 'distance', 1, 20).onChange(() => {updatePlanetDistance(planetData); playSoundEffect(soundEffects.clickEffect);});
+    });
+    // Create a folder in the GUI for light controls
+    const lightFolder = gui.addFolder('Light');
+
+    // Add ambient light controls to the light folder
+    const ambientLightControls = {
+      intensity: ambientLight.intensity,
+    };
+    lightFolder.add(ambientLightControls, 'intensity', 0, 1).name('Ambient Intensity').onChange((value) => {
+      ambientLight.intensity = value;
+    });
+
+    // Add directional light controls to the light folder
+    const directionalLightControls = {
+      intensity: directionalLight.intensity,
+    };
+    lightFolder.add(directionalLightControls, 'intensity', 0, 1).name('Directional Intensity').onChange((value) => {
+      directionalLight.intensity = value;
     });
 
     const generateButton = {
