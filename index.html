@@ -145,6 +145,8 @@
       return planet;
     }
 
+    let currentPlanetIndex = 0;
+
     function generatePlanet() {
       const planetData = [
         { planet: 'Mercury', color: 0xffffff, size: 0.2, speed: 0.005, distance: 2, index: 0, texture: './textures/mercury.jpg' },
@@ -157,12 +159,14 @@
         { planet: 'Neptune', color: 0xffffff, size: 0.3, speed: 0.00025, distance: 13, index: 7, texture: './textures/neptune.jpg' }
       ];
 
-      for (let i = 0; i < planetData.length; i++) {
-        const planet = createPlanet(planetData[i]);
+      if (currentPlanetIndex < planetData.length) {
+        const planet = createPlanet(planetData[currentPlanetIndex]);
         planets.push(planet);
-        planetParams.push(planetData[i]);
+        planetParams.push(planetData[currentPlanetIndex]);
+        currentPlanetIndex++;
       }
     }
+
 
 
     function destroyPlanet() {
